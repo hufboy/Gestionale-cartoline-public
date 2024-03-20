@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Logs - Recenti</title>
+    <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.css">
+    
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" ></script>
+    <script src="../../node_modules/tabulator-tables/dist/js/tabulator.js" ></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js" ></script>
+    <script src="../../node_modules/xlsx/dist/xlsx.core.min.js"></script>
+    <link rel="stylesheet" href="../../node_modules/bootstrap-icons/font/bootstrap-icons.css"></link>
+
+
+  </head>
+  <body>
+    
+    <div class="row-fluid m-2">
+        <strong class="h2">Logs</strong>
+    </div>
+    
+   
+      <div class="container-fluid m-2" id="ContainerTab1">
+        <div id="txtLogs">
+        </div>
+      
+
+      
+      
+    </div>
+
+    
+    
+  </body>
+  <script>
+    // const view1 = $('#ContainerTab1');
+    // const view2 = $('#ContainerTab2');
+    // const view3 = $('#ContainerTab3');
+    const MAX_LINES = 100;
+    const logsarea = document.getElementById('txtLogs');
+    $(document).ready(async() => {
+      
+      let res = await window.LogsApi.GetLogs();
+      
+      if(res.length > MAX_LINES){
+        for(var i = 0; i < MAX_LINES; i++){
+        const line = document.createElement('span');
+        const nl = document.createElement('br');
+        line.innerHTML = res[i] + "\n";
+        logsarea.append(line);
+        logsarea.append(nl);
+        // logsarea.value += res[i] + "\n";
+      }
+      }else{
+        for(var i = 0; i < res.length; i++){
+          const line = document.createElement('span');
+          const nl = document.createElement('br');
+          line.innerHTML = res[i] + "\n";
+          logsarea.append(line);
+          logsarea.append(nl);
+        // logsarea.value += res[i] + "\n";
+      }
+      }
+
+      
+    });
+
+    
+
+
+    
+
+  </script>
+</html>

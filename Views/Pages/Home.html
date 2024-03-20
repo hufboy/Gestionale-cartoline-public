@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home page</title>
+  <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../../node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.css">
+
+  <script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../../node_modules/tabulator-tables/dist/js/tabulator.js"></script>
+  <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="../../node_modules/xlsx/dist/xlsx.core.min.js"></script>
+  <link rel="stylesheet" href="../../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+  </link>
+
+
+</head>
+
+<body>
+
+  <div class="row-fluid ml-2">
+    <nav class="navbar bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#"><strong class="h2">Gestionale cartoline</strong></a>
+        <div class="pull-rigth">
+
+          <a class="btn btn-success" href="" onclick="Synchronize()" id="btnSync"><i
+              class="bi bi-cloud-check"></i>&nbsp;Salvato</a>
+          <a class="btn btn-default" href="#" onclick="ViewSearch()"><i class="bi bi-search"></i>&nbsp;Cerca</a>
+          <a class="btn btn-default" href="#" onclick="window.Data.ViewLogs()"><i
+              class="bi bi-braces"></i>&nbsp;Logs</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+
+
+  <!-- <div class="row m-2">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#" onclick="ManageTabs(1)" >Cartoline</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="ManageTabs(2)">Iconografia</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="ManageTabs(3)">Conventi</a>
+        </li>
+        
+      </ul>
+    </div> -->
+
+  <div class="row m-2">
+    <div class="container-fluid" id="ContainerTab1">
+      <div class="row-fluid m-2 ">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Inserisci Cartoline</h5>
+          </div>
+          <div class="card-body">
+
+            <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
+            <input type="text" class="form-control m-2" placeholder="Categoria" id="tboxCat">
+            <input type="text" class="form-control m-2" placeholder="Data" id="tboxData">
+            <input type="text" class="form-control m-2" placeholder="Nome" id="tboxNome">
+
+
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="radiotipo" id="radiotipo1id" checked
+                onclick="SetTipo(0)">
+              <label class="form-check-label" for="radiotipo1id">
+                Conventi
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="radiotipo" id="radiotipo2id" onclick="SetTipo(1)">
+              <label class="form-check-label" for="radiotipo2id">
+                Frati
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="radiotipo" id="radiotipo3id" onclick="SetTipo(2)">
+              <label class="form-check-label" for="radiotipo3id">
+                Iconografia
+              </label>
+            </div>
+
+            <textarea class="form-control m-2" placeholder="Note" id="tareaNote"></textarea>
+            <a href="#" class="btn btn-primary m-2" onclick="AddRow()"><i class="bi bi-plus"></i>&nbsp;Aggiungi</a>
+            <a href="#" class="btn btn-success m-2" onclick="ExportExcel()"><i
+                class="bi bi-filetype-xlsx"></i>&nbsp;Esporta Excel</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row m-2">
+      <div class="container-fluid">
+        <div class=" table table-fluid" id="TableData"></div>
+      </div>
+    </div>
+
+    
+  </div>
+
+</body>
+<script>
+  
+
+  let TableDataaa;
+  let SelectedType = undefined;
+  $(window).keydown(function (e) {
+    if ((e.keyCode == 70 && (e.ctrlKey || e.metaKey)) ||
+      (e.keyCode == 191)) {
+      ViewSearch();
+    }
+
+    return true;
+  })
+
+  $(document).ready(async () => {
+
+    setupTable();
+    await UpdateTable();
+
+
+
+  });
+
+  function setupTable() {
+    TableDataaa = new Tabulator("#TableData", {
+      data: [],
+      columns: [
+        { title: "ID", field: "id", sorter: "number", width: 200 },
+        {
+          title: "Categoria", field: "cat", editor: "input", editorParams: {
+            search: true,
+
+            selectContents: true,
+            elementAttributes: {
+              maxlength: "20", 
+            }
+          }
+        },
+        {
+          title: "Tipo", field: "type", width: 150, editor: "input", editorParams: {
+            search: true,
+
+            selectContents: true,
+            elementAttributes: {
+              maxlength: "20", 
+            }
+          }
+        },
+        {
+          title: "Nome", field: "name", editor: "input", editorParams: {
+            search: true,
+
+            selectContents: true,
+            elementAttributes: {
+              maxlength: "50", 
+            }
+          }
+        },
+        {
+          title: "Data", field: "date", editor: "input", editorParams: {
+            search: true,
+
+            selectContents: true,
+            elementAttributes: {
+              maxlength: "50", 
+            }
+          }
+        },
+        {
+          title: "Note", field: "notes", editor: "textarea", editorParams: {
+            elementAttributes: {
+              maxlength: "1000", 
+            },
+
+            selectContents: true,
+            verticalNavigation: "editor", 
+            shiftEnterSubmit: true, 
+          }
+        },
+      ],
+      selectable: true,
+      minHeight: 600,
+      placeholder: function () {
+        return '<strong class="h2">Nessun dato disponibile</strong>'
+      },
+      
+      layout: "fitColumns",
+      pagination: "local",
+      paginationSize: 100,
+      paginationSizeSelector: [50, 100, 200, 500],
+    });
+
+
+    TableDataaa.on("cellEdited", function (cell) {
+      const id = cell._cell.row.cells[0].value;
+
+
+      var obj = {};
+      obj.id = cell._cell.row.cells[0].value;
+      obj.cat = cell._cell.row.cells[1].value;
+      obj.tipo = cell._cell.row.cells[2].value;
+      obj.nome = cell._cell.row.cells[3].value;
+      obj.data = cell._cell.row.cells[4].value;
+      obj.note = cell._cell.row.cells[5].value;
+      UpdateRow(obj);
+    });
+  }
+
+  async function UpdateTable() {
+    await window.Data.GetCartoline().then((res) => {
+
+      TableDataaa.setData(res);
+    }).catch((err) => {
+      console.log(err);
+    })
+
+
+
+  }
+
+
+
+  async function AddRow() {
+    if (SelectedType == undefined) {
+      return;
+    }
+
+    var newdata = {};
+    newdata.data = $('#tboxData').val();
+    newdata.note = $('#tareaNote').val();
+    newdata.cat = $('#tboxCat').val();
+    newdata.nome = $('#tboxNome').val();
+    newdata.tipo = SelectedType;
+    await window.Data.InsertCartoline(newdata).then((res) => {
+      if (res == true) {
+        UpdateTable();
+      } else {
+
+      }
+    })
+  }
+
+  async function UpdateRow(obj) {
+    console.log(obj);
+    await window.Data.UpdateCartoline(obj).then((data) => {
+      console.log(data);
+    })
+  }
+  function SetTipo(id) {
+    switch (id) {
+      case 0: SelectedType = "Conventi"; break;
+      case 1: SelectedType = "Frati"; break;
+      case 2: SelectedType = "Iconografia"; break;
+      default: break;
+    }
+
+    console.log(SelectedType);
+  }
+
+  function ExportExcel() {
+    const d = new Date();
+    TableDataaa.download("xlsx", "Cartoline_" + d.getDay() + ".xlsx", { sheetName: "Cartoline" });
+  }
+
+  function ViewSearch() {
+
+    window.Data.ViewSearch();
+    window.Data.SetFilter(Filter);
+
+  }
+
+  function Filter(ev, arg) {
+
+    if (arg != undefined) {
+      if (arg.mode == 'SET') {
+        if (arg.type == 1) {
+          TableDataaa.setFilter("name", "like", arg.text);
+        } else if (arg.type == 2) {
+          TableDataaa.setFilter("date", "like", arg.text);
+        } else if (arg.type == 3) {
+          TableDataaa.setFilter("cat", "like", arg.text);
+        } else if (arg.type == 4) {
+          TableDataaa.setFilter("notes", "like", arg.text);
+        }
+      } else {
+        TableDataaa.clearFilter();
+      }
+
+
+    }
+  }
+
+  function Synchronize(rs) {
+    const btn = $('#btnSync');
+    const SyncOk = `<i class="bi bi-cloud-check"></i>&nbsp;Salvato`
+    const SyncErr = `<i class="bi bi-cloud-minus"></i>&nbsp;Errore salvataggio`
+
+    if (rs) {
+      btn.removeClass();
+      btn.addClass("btn btn-success");
+      btn.html(SyncOk);
+    } else {
+      btn.removeClass();
+      btn.addClass("btn btn-danger");
+      btn.html(SyncErr);
+    }
+
+  }
+
+</script>
+
+</html>

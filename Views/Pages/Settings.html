@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cerca - Filtri</title>
+    <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.css">
+    
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" ></script>
+    <script src="../../node_modules/tabulator-tables/dist/js/tabulator.js" ></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js" ></script>
+    <script src="../../node_modules/xlsx/dist/xlsx.core.min.js"></script>
+    <link rel="stylesheet" href="../../node_modules/bootstrap-icons/font/bootstrap-icons.css"></link>
+
+
+  </head>
+  <body>
+    <div class="row-fluid m-2">
+    </div>
+
+  </body>
+  <script>
+    // const view1 = $('#ContainerTab1');
+    // const view2 = $('#ContainerTab2');
+    // const view3 = $('#ContainerTab3');
+
+    let TableDataaa; 
+    let SelectedType = undefined;
+    let FilterObj = {};
+    $(document).ready(async() => {
+      
+        FilterObj.mode = '';
+        FilterObj.text = '';
+        FilterObj.type = 1;
+      
+
+      
+      });
+    
+    function TypeSelector(id){
+        SelectedType = id;
+    }
+
+    function textBoxChange(){
+        const vall = $('#FiltroTestoInput').val();
+        if(vall == ""){
+            FilterObj.mode = 'REMOVE';
+            FilterObj.type = SelectedType;
+            
+
+        }else{
+            FilterObj.mode = 'SET';
+            FilterObj.type = SelectedType;
+        }
+        FilterObj.text = vall;
+
+        window.Data.SetFilter(FilterObj);
+    }
+
+
+    
+
+  </script>
+</html>

@@ -1,2 +1,4 @@
 # Gestionale-cartoline-public
-Simple management desktop app built with electron and nodeJs
+Simple and basic management desktop app built with electron framework
+
+
